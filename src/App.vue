@@ -19,19 +19,21 @@
                   <td>{{ user.user }}</td>
                   <td>{{ user.site }}</td>
                   <td>{{ user.password }}</td>
-                  <td><input class="btn btn-danger" @click="updateSenhas(user.id, user.user, user.site, user.password)" type="button" :value="user.id"></td>
+                  <td><input class="btn btn-dark" @click="updateSenhas(user.id, user.user, user.site, user.password)" type="button" :value="'Update'"></td>
+                  <td><input class="btn btn-danger" @click="deleteSenhas(user.id, user.user, user.site, user.password)" type="button" :value="'Delete'"></td>
               </tr>
           </tbody>
       </table>
       </div>
-    <button class="btn btn-primary" @click="aplicador4 = !aplicador4  ">List</button> 
-    <button class="btn btn-primary" @click="aplicador3 = !aplicador3">Find</button>    
-    <button class="btn btn-primary" @click="aplicador2 = !aplicador2">Salve</button>    
+      
     <!-- <button class="btn btn-primary"  @click="aplicador = !aplicador">Update</button>     -->
     <findBySite :class="{update3:aplicador3}" msg="SENHAS"></findBySite> 
     <br>
-    <update-senhas :class="{update:aplicador}" :id="id" :user="user" :site="site" :password="password"/>      
-    <save-senhas  :class="{update2:aplicador2}"></save-senhas>
+    <button class="btn btn-primary" @click="showList()">List</button> 
+    <button class="btn btn-primary" @click="openGetSenhas()">Find</button>    
+    <button class="btn btn-primary" @click="save()">Save</button> 
+    <update-senhas :class="{update:aplicador}" :id="id" :user="user" :site="site" :password="password"></update-senhas>      
+    <save-senhas  :class="{update2:aplicador2}" :save="save"></save-senhas>
     
      
   </div>
@@ -54,19 +56,19 @@ export default {
   },
   data(){
      return {
-       aplicador: true,
-       aplicador2: true,
-       aplicador3: true,
-       aplicador4: true,
+        aplicador: true,
+        aplicador2: true,
+        aplicador3: true,
+        aplicador4: true,
         title: "Your passwords:",
-        senhas: null,
+        senhas: {},
         users: null,
         id: null,
         ids : [],
         user: null,
         site: null,
         password: null,
-        element: null
+        
      }  
   },
   methods: {
@@ -74,8 +76,35 @@ export default {
     getSenhas(){      
             fetch('http://localhost:8081/senhas')
             .then(resp => resp.json())
-            .then(senhas=>  this.users = senhas)            
-            return this.users
+            .then(senhas=>  this.users = senhas)                      
+            return this.users            
+
+    },
+
+    showList(){
+        this.aplicador4 = !this.aplicador4
+        if(!this.aplicador){
+          this.aplicador = true;
+        }
+        if(!this.aplicador3){
+          this.aplicador3 = true;
+        }
+        if(!this.aplicador2){
+          this.aplicador2 = true;
+        }
+    },
+
+    openGetSenhas(){
+      this.aplicador3 = !this.aplicador3
+       if(!this.aplicador){
+          this.aplicador = true;
+       }
+       if(!this.aplicador2){
+              this.aplicador2 = true;
+       }
+       if(!this.aplicador4){
+              this.aplicador4 = true;
+       } 
     },
 
     updateSenhas: function (id, user, site, password) {               
@@ -86,8 +115,48 @@ export default {
                 this.password = password
                 this.users.splice(index, 1)
                 window.console.log(this.id + ' - ' + this.user + ' - ' + this.site + ' - ' + this.password)
-                this.aplicador = !this.aplicador               
-        }    
+                this.aplicador = !this.aplicador
+                if(!this.aplicador3){
+                  this.aplicador3 = true;
+                }
+                if(!this.aplicador2){
+                  this.aplicador2 = true;
+                }
+                if(!this.aplicador4){
+                  this.aplicador4 = true;
+                }               
+    }, //updateSenhas_end
+    
+    deleteSenhas: function (id, user, site, password) {              
+                this.senhas.id = id
+                this.senhas.user = user
+                this.senhas.site = site
+                this.senhas.password = password                
+                window.console.log(this.senhas)
+                const json = JSON.stringify(this.senhas)
+                var url = 'http://localhost:8081/senhas/' + this.senhas.id
+                fetch(url, {
+                  method: 'delete',
+                    headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                    },
+                      body: json
+                    })  
+                    window.console.log(json)
+                              
+    }, //deleteSenhas_end
+
+    save(){
+      this.aplicador2 = !this.aplicador2
+      if(!this.aplicador3){
+        this.aplicador3 = true;
+      }
+      if(!this.aplicador4){
+        this.aplicador4 = true;
+      }
+    }
+    
   },
   mounted() {
         this.getSenhas()

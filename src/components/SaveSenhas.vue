@@ -34,6 +34,13 @@ export default {
       }   
     }
   },
+
+  props :{
+    aplicador:Boolean,
+    aplicador3:String,
+    aplicador4:String,
+    save: String
+  },
   
     
   methods :{
@@ -47,7 +54,9 @@ export default {
           },
             body: json
           })  
-          window.console.log(json)
+          window.console.log(json);
+          
+          
                     
   } //saveSenhas end
 }
